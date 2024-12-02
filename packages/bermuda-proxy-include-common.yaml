@@ -1,0 +1,80 @@
+substitutions:
+  baud_rate: "0"  # If you need serial debugging, override this to 115200 or similar.
+  ble_interval: 320ms
+  ble_window: 300ms
+  proxy_active_scan: "True"  # Allow device to request scan info for device names etc
+  proxy_enable_outbound: "True"  # Allow HA to make outbound connections via this device
+
+esp32:
+  framework:
+    type: esp-idf  # This is important: the default "arduino" framework does not perform well.
+    sdkconfig_options:
+      # @grigi found in testing that these options resulted in better responsiveness.
+      # BLE 4.2 is supported by ALL ESP32 boards that have bluetooth, the original and derivatives.
+      CONFIG_BT_BLE_42_FEATURES_SUPPORTED: y
+      # Extend the watchdog timeout, so the device reboots if the device appears locked up for over 10 seconds.
+      CONFIG_ESP_TASK_WDT_TIMEOUT_S: "10"
+
+logger:
+  baud_rate: ${baud_rate}  # 0 Enables logging, but disables serial-port logging to free CPU and memory
+
+api:
+  # This ensures BLE scanning only happens after the wifi is up and 
+  # the device is connected to HomeAssistant. This is particularly
+  # important for ESP32-C3 devices, but is good for all.
+  on_client_connected:
+     - esp32_ble_tracker.start_scan:
+        continuous: true
+  # Disable BLE tracking when there are no active api connections
+  on_client_disconnected:
+    if:
+      condition:
+        not:
+          api.connected:
+      then:
+        - esp32_ble_tracker.stop_scan:
+
+esp32_ble_tracker:
+  scan_parameters:
+    # Don't auto start BLE scanning, we control it in the `api` section above.
+    continuous: False
+    
+    active: ${proxy_active_scan}  # send scan-request packets to gather more info, like device name for some devices.
+
+    interval: ${ble_interval}  # default 320ms - how long to spend on each advert channel
+    window:   ${ble_window}  # default 30ms - how long to actually "listen" in each interval. Reduce this if device is unstable.
+    # If the device cannot keep up or becomes unstable, reduce the "window" setting. This may be
+    # required if your device is controlling other sensors or doing PWM for lights etc.
+
+bluetooth_proxy:
+  active: ${proxy_enable_outbound}  # allows outbound connections from HA to devices.
+
+
+button:
+  - platform: restart
+    name: "Restart"
+    entity_category: config
+
+  - platform: factory_reset
+    name: "Factory Reset"
+    id: Reset
+    entity_category: config
+
+  - platform: safe_mode
+    name: "Safe Mode"
+    internal: false
+    entity_category: config
+
+sensor:
+  - platform: uptime
+    name: "Uptime"
+    id: uptime_sensor
+    entity_category: diagnostic
+    internal: true
+
+  - platform: wifi_signal
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+

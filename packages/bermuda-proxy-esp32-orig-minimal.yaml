@@ -1,0 +1,22 @@
+#
+# bermuda-proxy-esp32-orig-minimal.yaml
+#
+# This is for ESP32 original variants, like the ESP32-WROOM, ESP32-ROVER etc.
+#
+# See other configs for devices like the C3 or S3 etc.
+#
+# This package is for adding to an existing ESPHome config file, where you
+# have a device already configured and you just want to add bluetooth proxy
+# features and tuning for the best Bermuda performance.
+#
+
+substitutions:
+  baud_rate: "0"  # If you need serial debugging, override this to 115200 or similar.
+  ble_interval: 320ms
+  ble_window: 300ms
+  proxy_active_scan: "true"  # Set to false to avoid requesting scan info for device names etc
+  proxy_enable_outbound: "True"
+
+packages:
+  Bermuda.esp32_common: github://agittins/bermuda-proxies/packages/bermuda-proxy-include-common.yaml
+
