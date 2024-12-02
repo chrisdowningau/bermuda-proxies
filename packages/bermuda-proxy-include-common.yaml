@@ -49,6 +49,7 @@ esp32_ble_tracker:
 bluetooth_proxy:
   active: ${proxy_enable_outbound}  # allows outbound connections from HA to devices.
 
+safe_mode:
 
 button:
   - platform: restart
