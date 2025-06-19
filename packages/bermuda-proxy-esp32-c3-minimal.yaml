@@ -18,7 +18,7 @@ substitutions:
   proxy_enable_outbound: "True"
 
 packages:
-  Bermuda.include_common: github://agittins/bermuda-proxies/packages/bermuda-proxy-include-common.yaml
+  Bermuda.include_common: github://chrisdowningau/bermuda-proxies/packages/bermuda-proxy-include-common.yaml
 
 esp32:
   framework:
