@@ -49,33 +49,5 @@ esp32_ble_tracker:
 bluetooth_proxy:
   active: ${proxy_enable_outbound}  # allows outbound connections from HA to devices.
 
-safe_mode:
 
-button:
-  - platform: restart
-    name: "Restart"
-    entity_category: config
-
-  - platform: factory_reset
-    name: "Factory Reset"
-    id: Reset
-    entity_category: config
-
-  - platform: safe_mode
-    name: "Safe Mode"
-    internal: false
-    entity_category: config
-
-sensor:
-  - platform: uptime
-    name: "Uptime"
-    id: uptime_sensor
-    entity_category: diagnostic
-    internal: true
-
-  - platform: wifi_signal
-    name: "WiFi Signal dB"
-    id: wifi_signal_db
-    update_interval: 60s
-    entity_category: "diagnostic"
 
